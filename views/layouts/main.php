@@ -81,15 +81,15 @@ $(document).ready(function() {
     $('.ajax-link').on('click', function(e) {
         e.preventDefault(); // Sustabdome numatytąją nuorodos elgseną (neleidžiame puslapiui persikrauti)
 
-    // Pašaliname "active" klasę nuo visų nuorodų
-    $('.ajax-link').removeClass('active');
-    // Pridedame "active" klasę prie paspaustos nuorodos
-    $(this).addClass('active');
+        // Pašaliname "active" klasę nuo visų nuorodų
+        $('.ajax-link').removeClass('active');
+        // Pridedame "active" klasę prie paspaustos nuorodos
+        $(this).addClass('active');
 
-    // Gauname URL iš 'data-url' atributo
-    var urlToLoad = $(this).data('url');
-    // Iškviečiame turinio įkėlimo funkciją
-    loadContent(urlToLoad);
+        // Gauname URL iš 'data-url' atributo
+        var urlToLoad = $(this).data('url');
+        // Iškviečiame turinio įkėlimo funkciją
+        loadContent(urlToLoad);
     });
 
     // Papildomai, galite automatiškai įkelti naujienas puslapiui užsikrovus
