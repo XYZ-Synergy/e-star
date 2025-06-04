@@ -93,8 +93,8 @@ $(document).ready(function() {
     });
 
     // Papildomai, galite automatiškai įkelti naujienas puslapiui užsikrovus
-    // $('#dynamic-content-area').html('<p>Kraunasi pradinis turinys...</p>');
-    // loadContent($('.ajax-link.active').data('url'));
+    $('#dynamic-content-area').html('<p>Kraunasi pradinis turinys...</p>');
+    loadContent($('.ajax-link.active').data('url'));
 });
 <?php $this->endBlock(); ?>
 </script>
