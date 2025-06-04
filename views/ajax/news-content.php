@@ -1,4 +1,4 @@
-﻿<div class="ajax-content">
+<div class="ajax-content">
     <h2>Paskutinės Naujienos FOO BAR Priemiestyje!</h2>
     <p>Sveiki atvykę į mūsų naujienų skiltį! Čia rasite visą aktualiausią informaciją apie įvykius ir akcijas jūsų mieste.</p>
     <ul>

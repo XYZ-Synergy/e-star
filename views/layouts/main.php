@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 
 /** @var yii\web\View $this */
 /** @var string $content */
@@ -26,56 +26,80 @@ $this->registerLinkTag(['rel' => 'icon', 'type' => 'image/x-icon', 'href' => Yii
     <title><?= Html::encode($this->title) ?></title>
     <?php $this->head() ?>
 </head>
-<body class="d-flex flex-column h-100">
+<body>
 <?php $this->beginBody() ?>
 
-<header id="header">
-    <?php
-    NavBar::begin([
-        'brandLabel' => Yii::$app->name,
-        'brandUrl' => Yii::$app->homeUrl,
-        'options' => ['class' => 'navbar-expand-md navbar-dark bg-dark fixed-top']
-    ]);
-    echo Nav::widget([
-        'options' => ['class' => 'navbar-nav'],
-        'items' => [
-            ['label' => 'Home', 'url' => ['/site/index']],
-            ['label' => 'About', 'url' => ['/site/about']],
-            ['label' => 'Contact', 'url' => ['/site/contact']],
-            Yii::$app->user->isGuest
-                ? ['label' => 'Login', 'url' => ['/site/login']]
-                : '<li class="nav-item">'
-                    . Html::beginForm(['/site/logout'])
-                    . Html::submitButton(
-                        'Logout (' . Yii::$app->user->identity->username . ')',
-                        ['class' => 'nav-link btn btn-link logout']
-                    )
-                    . Html::endForm()
-                    . '</li>'
-        ]
-    ]);
-    NavBar::end();
-    ?>
-</header>
+<?php
+use yii\helpers\Url; // Įtraukiame Url pagalbinę klasę
+?>
 
-<main id="main" class="flex-shrink-0" role="main">
-    <div class="container">
-        <?php if (!empty($this->params['breadcrumbs'])): ?>
-            <?= Breadcrumbs::widget(['links' => $this->params['breadcrumbs']]) ?>
-        <?php endif ?>
-        <?= Alert::widget() ?>
-        <?= $content ?>
-    </div>
-</main>
-
-<footer id="footer" class="mt-auto py-3 bg-light">
-    <div class="container">
-        <div class="row text-muted">
-            <div class="col-md-6 text-center text-md-start">&copy; My Company <?= date('Y') ?></div>
-            <div class="col-md-6 text-center text-md-end"><?= Yii::powered() ?></div>
+<div class="container">
+    <div class="row">
+        <div class="col-md-3">
+            <ul class="nav nav-pills flex-column">
+                <li class="nav-item">
+                    <a class="nav-link ajax-link active" href="#" data-url="<?= Url::to(['ajax/get-news']); ?>">Naujienos</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link ajax-link" href="#" data-url="<?= Url::to(['ajax/get-about']); ?>">Apie mus</a>
+                </li>
+                </ul>
+        </div>
+        <div class="col-md-9">
+            <div id="dynamic-content-area">
+                <h2>Sveiki atvykę į "E-Star" projektą!</h2>
+                <p>Pasirinkite meniu punktą kairėje, kad pamatytumėte dinamiškai įkeliamą turinį.</p>
+            </div>
         </div>
     </div>
-</footer>
+</div>
+<script>
+<?php $this->beginBlock('scripts'); ?>
+$(document).ready(function() {
+    // Funkcija, kuri įkelia turinį per AJAX
+    function loadContent(url) {
+        $.ajax({
+            url: url, // URL, į kurį siunčiame užklausą
+            type: 'GET', // HTTP metodas (GET arba POST)
+        beforeSend: function() {
+            // Prieš siunčiant užklausą, galite parodyti įkėlimo animaciją
+            $('#dynamic-content-area').html('<p>Kraunasi turinys...</p>');
+        },
+        success: function(response) {
+            // Užklausai pavykus, įterpiame gautą atsakymą į nurodytą vietą
+            $('#dynamic-content-area').html(response);
+        },
+        error: function(xhr, status, error) {
+            // Jei įvyko klaida, parodome pranešimą
+            $('#dynamic-content-area').html('<p style="color: red;">Nepavyko įkelti turinio: ' + error + '</p>');
+            console.error("AJAX Error:", status, error, xhr);
+        }
+        });
+    }
+
+    // Įvykių tvarkyklė meniu punktams
+    $('.ajax-link').on('click', function(e) {
+        e.preventDefault(); // Sustabdome numatytąją nuorodos elgseną (neleidžiame puslapiui persikrauti)
+
+    // Pašaliname "active" klasę nuo visų nuorodų
+    $('.ajax-link').removeClass('active');
+    // Pridedame "active" klasę prie paspaustos nuorodos
+    $(this).addClass('active');
+
+    // Gauname URL iš 'data-url' atributo
+    var urlToLoad = $(this).data('url');
+    // Iškviečiame turinio įkėlimo funkciją
+    loadContent(urlToLoad);
+    });
+
+    // Papildomai, galite automatiškai įkelti naujienas puslapiui užsikrovus
+    // $('#dynamic-content-area').html('<p>Kraunasi pradinis turinys...</p>');
+    // loadContent($('.ajax-link.active').data('url'));
+});
+<?php $this->endBlock(); ?>
+</script>
+
+<?php $this->registerJs($this->blocks['scripts']); ?>
 
 <?php $this->endBody() ?>
 </body>
