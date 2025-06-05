@@ -3,6 +3,7 @@
 namespace app\controllers;
 
 use yii\web\Controller;
+use app\models\News;
 
 class AjaxController extends Controller
 {
@@ -20,10 +21,12 @@ class AjaxController extends Controller
 
         // Čia galėtumėte gauti naujienų duomenis iš duomenų bazės.
         // Pavyzdžiui:
-        // $news = YourNewsModel::find()->all();
+        $news = News::find()->orderBy(['created_at' => SORT_DESC])->all();
 
         // Šiuo metu tiesiog grąžinsime paprastą HTML.
-        return $this->render('news-content');
+        return $this->render('news-content', [
+            'news' => $news,
+        ]);
     }
 
     /**
