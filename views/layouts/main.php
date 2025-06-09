@@ -111,9 +111,13 @@ $(document).ready(function() {
                         $('#form-messages').html('<p style="color: green;">' + response.message + '</p>');
                         // Galite išvalyti formą po sėkmingo pateikimo
                         $form[0].reset();
-                        // Papildomai: galite atnaujinti naujienų sąrašą
-                        // pvz.:
-                        loadContent($('.ajax-link[data-url="<?= Url::to(['ajax/get-news']); ?>"]').data('url'));
+
+                        // *********** NAUJA DALIS ČIA ***********
+                        // Automatiškai iš naujo įkeliame naujienų sąrašą po sėkmingo pridėjimo
+                        // Gauname URL iš "Naujienų" meniu punkto 'data-url' atributo
+                        var newsUrl = $('.ajax-link[data-url="<?= Url::to(['ajax/get-news']); ?>"]').data('url');
+                        loadContent(newsUrl); // Iškviečiame turinio įkėlimo funkciją
+                        // ***************************************
                     } else {
                         // Parodome bendrą klaidos pranešimą
                         $('#form-messages').html('<p style="color: red;">' + response.message + '</p>');
