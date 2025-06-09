@@ -4,6 +4,7 @@ namespace app\controllers;
 
 use yii\web\Controller;
 use app\models\News;
+use yii\web\Response;
 
 class AjaxController extends Controller
 {
