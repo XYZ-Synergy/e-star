@@ -42,7 +42,10 @@ use yii\helpers\Url; // Įtraukiame Url pagalbinę klasę
                 <li class="nav-item">
                     <a class="nav-link ajax-link" href="#" data-url="<?= Url::to(['ajax/get-about']); ?>">Apie mus</a>
                 </li>
-                </ul>
+                <li>
+                    <a class="nav-link ajax-link" href="#" data-url="<?= Url::to(['ajax/create-news']); ?>">Pridėti Naujieną</a>
+                </li>
+            </ul>
         </div>
         <div class="col-md-9">
             <div id="dynamic-content-area">
@@ -67,12 +70,70 @@ $(document).ready(function() {
         success: function(response) {
             // Užklausai pavykus, įterpiame gautą atsakymą į nurodytą vietą
             $('#dynamic-content-area').html(response);
+            attachFormSubmitHandler();
         },
         error: function(xhr, status, error) {
             // Jei įvyko klaida, parodome pranešimą
             $('#dynamic-content-area').html('<p style="color: red;">Nepavyko įkelti turinio: ' + error + '</p>');
             console.error("AJAX Error:", status, error, xhr);
         }
+        });
+    }
+
+    // Nauja funkcija formos pateikimo tvarkymui
+    function attachFormSubmitHandler() {
+        // Nustatome įvykio tvarkyklę AJAX formai, naudojant delegavimą
+        // Delegavimas yra svarbus, nes forma bus dinamiškai įkelta
+        $('#dynamic-content-area').off('submit', '.ajax-form'); // Pašaliname ankstesnius handlerius, kad nepasikartotų
+        $('#dynamic-content-area').on('submit', '.ajax-form', function(e) {
+            e.preventDefault(); // Sustabdome numatytąjį formos pateikimą
+
+            var $form = $(this);
+            var url = $form.attr('action'); // Gauname URL iš formos 'action' atributo
+            var formData = $form.serialize(); // Serelizuojame formos duomenis į stringą
+
+            // Išvalome ankstesnius klaidų pranešimus
+            $form.find('.help-block').text('');
+            $form.find('.has-error').removeClass('has-error');
+            $('#form-messages').html('');
+
+
+            $.ajax({
+                url: url,
+                type: 'POST', // Naudojame POST, kad išsiųstume formos duomenis
+                data: formData, // Siunčiame formos duomenis
+                dataType: 'json', // Tikimės JSON atsakymo iš serverio
+                beforeSend: function() {
+                    $('#form-messages').html('<p>Siunčiama...</p>');
+                },
+                success: function(response) {
+                    if (response.success) {
+                        $('#form-messages').html('<p style="color: green;">' + response.message + '</p>');
+                        // Galite išvalyti formą po sėkmingo pateikimo
+                        $form[0].reset();
+                        // Papildomai: galite atnaujinti naujienų sąrašą
+                        // pvz.: loadContent($('.ajax-link[data-url="<?= Url::to(['ajax/get-news']); ?>"]').data('url'));
+                    } else {
+                        // Parodome bendrą klaidos pranešimą
+                        $('#form-messages').html('<p style="color: red;">' + response.message + '</p>');
+
+                        // Parodome specifines validavimo klaidas prie laukelių
+                        if (response.errors) {
+                            $.each(response.errors, function(attribute, errors) {
+                                var $input = $form.find('#news-' + attribute.toLowerCase()); // Randa laukelį pagal ID (pvz., #news-title)
+                            if ($input.length) {
+                                $input.closest('.form-group').addClass('has-error');
+                                $input.siblings('.help-block').text(errors.join(', '));
+                            }
+                            });
+                        }
+                    }
+                },
+                error: function(xhr, status, error) {
+                    $('#form-messages').html('<p style="color: red;">Klaida siunčiant duomenis: ' + error + '</p>');
+                    console.error("AJAX Form Error:", status, error, xhr.responseText);
+                }
+            });
         });
     }
 
