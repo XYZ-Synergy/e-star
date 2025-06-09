@@ -63,20 +63,20 @@ $(document).ready(function() {
         $.ajax({
             url: url, // URL, į kurį siunčiame užklausą
             type: 'GET', // HTTP metodas (GET arba POST)
-        beforeSend: function() {
-            // Prieš siunčiant užklausą, galite parodyti įkėlimo animaciją
-            $('#dynamic-content-area').html('<p>Kraunasi turinys...</p>');
-        },
-        success: function(response) {
-            // Užklausai pavykus, įterpiame gautą atsakymą į nurodytą vietą
-            $('#dynamic-content-area').html(response);
-            attachFormSubmitHandler();
-        },
-        error: function(xhr, status, error) {
-            // Jei įvyko klaida, parodome pranešimą
-            $('#dynamic-content-area').html('<p style="color: red;">Nepavyko įkelti turinio: ' + error + '</p>');
-            console.error("AJAX Error:", status, error, xhr);
-        }
+            beforeSend: function() {
+                // Prieš siunčiant užklausą, galite parodyti įkėlimo animaciją
+                $('#dynamic-content-area').html('<p>Kraunasi turinys...</p>');
+            },
+            success: function(response) {
+                // Užklausai pavykus, įterpiame gautą atsakymą į nurodytą vietą
+                $('#dynamic-content-area').html(response);
+                attachFormSubmitHandler();
+            },
+            error: function(xhr, status, error) {
+                // Jei įvyko klaida, parodome pranešimą
+                $('#dynamic-content-area').html('<p style="color: red;">Nepavyko įkelti turinio: ' + error + '</p>');
+                console.error("AJAX Error:", status, error, xhr);
+            }
         });
     }
 
