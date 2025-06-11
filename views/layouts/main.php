@@ -23,6 +23,7 @@ $this->registerLinkTag(['rel' => 'icon', 'type' => 'image/x-icon', 'href' => Yii
 <html lang="<?= Yii::$app->language ?>" class="h-100">
 <head>
     <title><?= Html::encode($this->title) ?></title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     <?php $this->head() ?>
 </head>
 <body>
@@ -58,15 +59,19 @@ use yii\helpers\Url; // Įtraukiame Url pagalbinę klasę
 <script>
 <?php $this->beginBlock('scripts'); ?>
 $(document).ready(function() {
+    // Funkcija, kuri parodo įkrovimo indikatorių
+    function showLoadingIndicator(targetElementId) {
+        // Galite čia įdėti GIF paveikslėlį, pvz.:
+        $('#' + targetElementId).html('<img src="/images/loading.gif" alt="Kraunasi..." style="width: 50px; height: 50px;">');
+        $('#' + targetElementId).html('<p style="text-align: center; color: #666;"><i class="fas fa-spinner fa-spin"></i> Kraunasi turinys...</p>');
+        // Pastaba: ikonėlei reikės Font Awesome bibliotekos įkėlimo jūsų pagrindiniame layout'e.
+    }
     // Funkcija, kuri įkelia turinį per AJAX
     function loadContent(url) {
+        showLoadingIndicator('dynamic-content-area'); // Rodyti įkrovimo indikatorių
         $.ajax({
             url: url, // URL, į kurį siunčiame užklausą
             type: 'GET', // HTTP metodas (GET arba POST)
-            beforeSend: function() {
-                // Prieš siunčiant užklausą, galite parodyti įkėlimo animaciją
-                $('#dynamic-content-area').html('<p>Kraunasi turinys...</p>');
-            },
             success: function(response) {
                 // Užklausai pavykus, įterpiame gautą atsakymą į nurodytą vietą
                 $('#dynamic-content-area').html(response);
@@ -103,14 +108,21 @@ $(document).ready(function() {
                 type: 'POST', // Naudojame POST, kad išsiųstume formos duomenis
                 data: formData, // Siunčiame formos duomenis
                 dataType: 'json', // Tikimės JSON atsakymo iš serverio
-                beforeSend: function() {
-                    $('#form-messages').html('<p>Siunčiama...</p>');
-                },
+                // beforeSend: function() {
+                //     $('#form-messages').html('<p>Siunčiama...</p>');
+                // },
                 success: function(response) {
                     if (response.success) {
                         $('#form-messages').html('<p style="color: green;">' + response.message + '</p>');
                         // Galite išvalyti formą po sėkmingo pateikimo
                         $form[0].reset();
+
+                        // *********** NAUJA DALIS ČIA (papildoma animacija) ***********
+                        // Galite paslėpti pranešimą po kelių sekundžių
+                        setTimeout(function() {
+                            $('#form-messages').html('');
+                        }, 3000); // Paslėpti po 3 sekundžių
+                        // *************************************************************
 
                         // *********** NAUJA DALIS ČIA ***********
                         // Automatiškai iš naujo įkeliame naujienų sąrašą po sėkmingo pridėjimo
