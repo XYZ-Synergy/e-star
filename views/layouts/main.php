@@ -124,12 +124,27 @@ $(document).ready(function() {
                         }, 3000); // Paslėpti po 3 sekundžių
                         // *************************************************************
 
-                        // *********** NAUJA DALIS ČIA ***********
-                        // Automatiškai iš naujo įkeliame naujienų sąrašą po sėkmingo pridėjimo
-                        // Gauname URL iš "Naujienų" meniu punkto 'data-url' atributo
-                        var newsUrl = $('.ajax-link[data-url="<?= Url::to(['ajax/get-news']); ?>"]').data('url');
-                        loadContent(newsUrl); // Iškviečiame turinio įkėlimo funkciją
-                        // ***************************************
+                        // *********** NAUJA DALIS ČIA (soft atnaujinimas) ***********
+                        if (response.newsItemHtml) {
+                            // Patikriname, ar šiuo metu rodomas naujienų sąrašas
+                            if ($('#news-list-container').length) {
+                                // Įterpiame naują elementą sąrašo viršuje
+                                $('#news-list-container').prepend(response.newsItemHtml);
+
+                                // Pašaliname "Šiuo metu naujienų nėra" pranešimą, jei jis yra
+                                $('#no-news-message').remove();
+
+                                // Galite pridėti trumpą animaciją naujai pridėtam elementui
+                                $('#news-list-container').find('.news-item-newly-added').hide().fadeIn(800, function() {
+                                    $(this).removeClass('news-item-newly-added'); // Pašalinti klasę, kad animacija nebepasikartotų
+                                });
+                            } else {
+                                // Jei naujienų sąrašas nebuvo rodomas, tiesiog jį įkeliame
+                                var newsUrl = $('.ajax-link[data-url="<?= Url::to(['ajax/get-news']); ?>"]').data('url');
+                                loadContent(newsUrl);
+                            }
+                        }
+                        // *************************************************************
                     } else {
                         // Parodome bendrą klaidos pranešimą
                         $('#form-messages').html('<p style="color: red;">' + response.message + '</p>');

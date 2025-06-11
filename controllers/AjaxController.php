@@ -59,7 +59,9 @@ class AjaxController extends Controller
         if ($model->load(\Yii::$app->request->post())) {
             if ($model->save()) {
                 // Jei išsaugota sėkmingai, grąžiname sėkmės pranešimą ir naujai sukurtą straipsnį
-                return ['success' => true, 'message' => 'Straipsnis sėkmingai pridėtas!', 'newsItem' => $model->toArray()];
+                $itemHtml = $this->renderPartial('single-news-item', ['item' => $model]);
+
+                return ['success' => true, 'message' => 'Straipsnis sėkmingai pridėtas!', 'newsItemHtml' => $itemHtml];
             } else {
                 // Jei išsaugojimo metu įvyko klaida, grąžiname klaidų pranešimus
                 return ['success' => false, 'message' => 'Nepavyko išsaugoti straipsnio.', 'errors' => $model->getErrors()];
