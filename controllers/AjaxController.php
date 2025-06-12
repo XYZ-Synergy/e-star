@@ -4,10 +4,24 @@ namespace app\controllers;
 
 use yii\web\Controller;
 use app\models\News;
+use app\models\Comment; // Naujas importas
 use yii\web\Response;
+use yii\filters\VerbFilter; // Reikalinga POST užklausoms
 
 class AjaxController extends Controller
 {
+    public function behaviors()
+    {
+        return [
+            'verbs' => [
+                'class' => VerbFilter::class,
+                'actions' => [
+                    'create-news' => ['POST'],
+                    'create-comment' => ['POST'], // Nurodome, kad tik POST metodas leidžiamas
+                ],
+            ],
+        ];
+    }
     /**
      * Veiksmas, kuris grąžins "Naujienų" turinį.
      * Naudojama AJAX užklausoms.
@@ -74,5 +88,50 @@ class AjaxController extends Controller
         return $this->render('create-news-form', [
             'model' => $model,
         ]);
+    }
+
+    /**
+     * Veiksmas, kuris grąžina komentarus konkrečiam naujienų straipsniui.
+     * @param int $news_id Naujienų straipsnio ID
+     * @return string
+     */
+    public function actionGetComments($news_id)
+    {
+        $this->layout = false;
+        $comments = Comment::find()
+            ->where(['news_id' => $news_id])
+            ->orderBy(['created_at' => SORT_ASC]) // Komentarus rodoma nuo seniausių
+            ->all();
+
+        return $this->render('comments-list', [
+            'comments' => $comments,
+            'news_id' => $news_id // Perduodame news_id, kad formoje žinotume, kuriam straipsniui pridėti
+        ]);
+    }
+
+    /**
+     * Veiksmas naujo komentaro pridėjimui per AJAX.
+     * @return array JSON atsakymas
+     */
+    public function actionCreateComment()
+    {
+        \Yii::$app->response->format = Response::FORMAT_JSON;
+
+        $model = new Comment();
+        // Jei turite vartotojų sistemą ir vartotojas yra prisijungęs:
+        // $model->user_id = \Yii::$app->user->id;
+
+        if ($model->load(\Yii::$app->request->post())) {
+            if ($model->save()) {
+                // Sėkmės atveju, taip pat atvaizduojame naujai sukurto komentaro HTML
+                $commentHtml = $this->renderPartial('single-comment-item', ['item' => $model]);
+
+                return ['success' => true, 'message' => 'Komentaras sėkmingai pridėtas!', 'commentItemHtml' => $commentHtml];
+            } else {
+                return ['success' => false, 'message' => 'Nepavyko išsaugoti komentaro.', 'errors' => $model->getErrors()];
+            }
+        }
+        // Šis else blokas dažniausiai nebus pasiektas, nes forma siunčiama per AJAX POST
+        return ['success' => false, 'message' => 'Neteisinga užklausa.'];
     }
 }
