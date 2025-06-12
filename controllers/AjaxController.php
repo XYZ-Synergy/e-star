@@ -165,4 +165,58 @@ class AjaxController extends Controller
 
         return ['success' => false, 'message' => 'Straipsnis nerastas.'];
     }
+
+    /**
+     * Veiksmas, grąžinantis neperskaitytus pranešimus.
+     * @return array JSON atsakymas
+     */
+    public function actionGetNotifications()
+    {
+        \Yii::$app->response->format = Response::FORMAT_JSON;
+
+        // Reikia, kad vartotojas būtų prisijungęs:
+        // if (\Yii::$app->user->isGuest) {
+        //     return ['success' => false, 'message' => 'Neprisijungęs vartotojas.'];
+        // }
+
+        $userId = 1; // Pakeiskite į \Yii::$app->user->id realioje sistemoje
+        $notifications = Notification::find()
+            ->where(['user_id' => $userId, 'is_read' => false])
+            ->orderBy(['created_at' => SORT_DESC])
+            ->all();
+
+        $notificationData = [];
+        foreach ($notifications as $notification) {
+            $notificationData[] = [
+                'id' => $notification->id,
+                'message' => $notification->message,
+                'created_at' => Yii::$app->formatter->asRelativeTime($notification->created_at), // Atvaizdavimas "prieš 5 minutes"
+                // Galite pridėti nuorodą, susijusią su pranešimu
+            ];
+        }
+
+        return ['success' => true, 'notifications' => $notificationData, 'count' => count($notificationData)];
+    }
+
+    /**
+     * Veiksmas, žymintis pranešimą kaip perskaitytą.
+     * @param int $id Pranešimo ID
+     * @return array JSON atsakymas
+     */
+    public function actionMarkNotificationAsRead($id)
+    {
+        \Yii::$app->response->format = Response::FORMAT_JSON;
+        $notification = Notification::findOne($id);
+
+        // Reikia, kad vartotojas būtų prisijungęs ir pranešimas priklausytų jam
+        // if ($notification && $notification->user_id == \Yii::$app->user->id) {
+
+        if ($notification) { // Pavyzdžiui be vartotojo
+            $notification->is_read = true;
+            if ($notification->save()) {
+                return ['success' => true];
+            }
+        }
+        return ['success' => false, 'message' => 'Pranešimas nerastas arba neturi teisių.'];
+    }
 }

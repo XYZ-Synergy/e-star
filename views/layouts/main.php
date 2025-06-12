@@ -46,6 +46,13 @@ use yii\helpers\Url; // Įtraukiame Url pagalbinę klasę
                 <li>
                     <a class="nav-link ajax-link" href="#" data-url="<?= Url::to(['ajax/create-news']); ?>">Pridėti Naujieną</a>
                 </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#" id="notifications-toggle">
+                        Pranešimai <span class="badge badge-pill badge-danger" id="notifications-count">0</span>
+                    </a>
+                    <div id="notifications-dropdown" class="dropdown-menu" style="display: none; position: absolute; max-height: 300px; overflow-y: auto;">
+                    </div>
+                </li>
             </ul>
         </div>
         <div class="col-md-9">
@@ -313,6 +320,69 @@ $(document).ready(function() {
     // Papildomai, galite automatiškai įkelti naujienas puslapiui užsikrovus
     $('#dynamic-content-area').html('<p>Kraunasi pradinis turinys...</p>');
     loadContent($('.ajax-link.active').data('url'));
+
+    // Funkcija, kuri įkelia pranešimus
+    function loadNotifications() {
+        $.ajax({
+            url: '<?= Url::to(['ajax/get-notifications']); ?>',
+               type: 'GET',
+               dataType: 'json',
+               success: function(response) {
+                   if (response.success) {
+                       $('#notifications-count').text(response.count);
+                       var $dropdown = $('#notifications-dropdown');
+                       $dropdown.html(''); // Išvalyti esamus pranešimus
+
+                       if (response.count > 0) {
+                           $('#notifications-count').show(); // Rodyti ženkliuką
+                           $.each(response.notifications, function(index, notification) {
+                               var notificationHtml = '<a class="dropdown-item notification-item" href="#" data-id="' + notification.id + '">' +
+                           notification.message + ' <small class="text-muted">' + notification.created_at + '</small>' +
+                           '</a>';
+                           $dropdown.append(notificationHtml);
+                           });
+                       } else {
+                           $('#notifications-count').hide(); // Slėpti ženkliuką
+                           $dropdown.append('<span class="dropdown-item">Nėra naujų pranešimų.</span>');
+                       }
+                   }
+               },
+               error: function(xhr, status, error) {
+                   console.error("AJAX Notifications Error:", status, error);
+               }
+        });
+    }
+
+    // Įvykių tvarkyklė pranešimų mygtukui
+    $('#notifications-toggle').on('click', function(e) {
+        e.preventDefault();
+        $('#notifications-dropdown').toggle(); // Rodyti/slėpti išskleidžiamąjį meniu
+        loadNotifications(); // Kaskart atidarius, atnaujinti pranešimus
+    });
+
+    // Žymėti pranešimą kaip perskaitytą
+    $('#notifications-dropdown').on('click', '.notification-item', function(e) {
+        e.preventDefault();
+        var $item = $(this);
+        var notificationId = $item.data('id');
+
+        $.ajax({
+            url: '<?= Url::to(['ajax/mark-notification-as-read']); ?>' + '?id=' + notificationId,
+               type: 'POST',
+               dataType: 'json',
+               success: function(response) {
+                   if (response.success) {
+                       $item.remove(); // Pašalinti perskaitytą pranešimą iš sąrašo
+                       loadNotifications(); // Atnaujinti skaičių
+                   }
+               }
+        });
+    });
+
+
+    // Reguliariai įkelkite pranešimus (pvz., kas 30 sekundžių)
+    setInterval(loadNotifications, 30000); // 30 sekundžių
+    loadNotifications(); // Įkelti iškart užsikrovus puslapiui
 });
 <?php $this->endBlock(); ?>
 </script>
