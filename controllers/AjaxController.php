@@ -16,7 +16,7 @@ class AjaxController extends Controller
             'verbs' => [
                 'class' => VerbFilter::class,
                 'actions' => [
-                    'create-news' => ['POST'],
+                    'create-news' => ['POST', 'GET'],
                     'create-comment' => ['POST'], // Nurodome, kad tik POST metodas leidžiamas
                 ],
             ],
@@ -124,7 +124,7 @@ class AjaxController extends Controller
         if ($model->load(\Yii::$app->request->post())) {
             if ($model->save()) {
                 // Sėkmės atveju, taip pat atvaizduojame naujai sukurto komentaro HTML
-                $commentHtml = $this->renderPartial('single-comment-item', ['item' => $model]);
+                $commentHtml = $this->renderPartial('_single_comment_item', ['item' => $model]);
 
                 return ['success' => true, 'message' => 'Komentaras sėkmingai pridėtas!', 'commentItemHtml' => $commentHtml];
             } else {
