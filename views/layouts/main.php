@@ -169,6 +169,91 @@ $(document).ready(function() {
         });
     }
 
+    // NAUJA: Funkcija komentarų formos pateikimo tvarkymui
+    function attachCommentFormSubmitHandler() {
+        $('#dynamic-content-area').off('submit', '.ajax-comment-form'); // Atjungti esamus handlerius
+        $('#dynamic-content-area').on('submit', '.ajax-comment-form', function(e) {
+            e.preventDefault();
+
+            var $form = $(this);
+            var url = $form.attr('action');
+            var formData = $form.serialize();
+            var newsId = $form.find('input[name="Comment[news_id]"]').val(); // Gaminame news_id
+
+            var $messagesDiv = $('#comment-form-messages-' + newsId);
+            $messagesDiv.html('');
+
+            $.ajax({
+                url: url,
+                type: 'POST',
+                data: formData,
+                dataType: 'json',
+                beforeSend: function() {
+                    $messagesDiv.html('<p>Siunčiama...</p>');
+                },
+                success: function(response) {
+                    if (response.success) {
+                        $messagesDiv.html('<p style="color: green;">' + response.message + '</p>');
+                        $form[0].reset();
+
+                        // Įterpti naują komentarą sąrašo viršuje
+                        $('#comments-container').append(response.commentItemHtml); // Komentarus paprastai dedame į apačią
+
+                        // Atnaujinti komentarų skaičių
+                        var $commentCountSpan = $('#comment-count');
+                        $commentCountSpan.text(parseInt($commentCountSpan.text()) + 1);
+
+                        $('#no-comments-message').remove(); // Pašalinti "Komentarų dar nėra"
+
+                        setTimeout(function() {
+                            $messagesDiv.html('');
+                        }, 3000);
+
+                    } else {
+                        $messagesDiv.html('<p style="color: red;">' + response.message + '</p>');
+                        // Čia galite pridėti validavimo klaidų rodymą, kaip ir naujienų formoje
+                        // pvz.: if (response.errors) { ... }
+                    }
+                },
+                error: function(xhr, status, error) {
+                    $messagesDiv.html('<p style="color: red;">Klaida siunčiant komentarą: ' + error + '</p>');
+                    console.error("AJAX Comment Form Error:", status, error, xhr.responseText);
+                }
+            });
+        });
+    }
+
+    // NAUJA: Įvykių tvarkyklė "Peržiūrėti Komentarus" mygtukams
+    $('#dynamic-content-area').on('click', '.view-comments-btn', function() {
+        var $button = $(this);
+        var newsId = $button.data('news-id');
+        var commentsUrl = $button.data('url');
+        var $commentsArea = $('#comments-area-' + newsId);
+
+        if ($commentsArea.is(':visible')) {
+            $commentsArea.slideUp(function() {
+                $commentsArea.html(''); // Išvalyti turinį, kai paslepiame
+                $button.text('Peržiūrėti Komentarus');
+            });
+        } else {
+            $commentsArea.html('<p style="text-align: center; color: #666;"><i class="fas fa-spinner fa-spin"></i> Kraunasi komentarai...</p>');
+            $commentsArea.slideDown(); // Rodome kol kraunasi
+            $.ajax({
+                url: commentsUrl,
+                type: 'GET',
+                success: function(response) {
+                    $commentsArea.html(response);
+                    $button.text('Slėpti Komentarus');
+                    attachCommentFormSubmitHandler(); // Prisegti handlerius naujai įkeltai komentarų formai
+                },
+                error: function(xhr, status, error) {
+                    $commentsArea.html('<p style="color: red;">Nepavyko įkelti komentarų: ' + error + '</p>');
+                    console.error("AJAX Comments Error:", status, error, xhr);
+                }
+            });
+        }
+    });
+
     // Įvykių tvarkyklė meniu punktams
     $('.ajax-link').on('click', function(e) {
         e.preventDefault(); // Sustabdome numatytąją nuorodos elgseną (neleidžiame puslapiui persikrauti)
