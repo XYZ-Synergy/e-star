@@ -18,6 +18,7 @@ class AjaxController extends Controller
                 'actions' => [
                     'create-news' => ['POST', 'GET'],
                     'create-comment' => ['POST'], // Nurodome, kad tik POST metodas leidžiamas
+                    'like-news' => ['POST'], // Leisti tik POST užklausas
                 ],
             ],
         ];
@@ -133,5 +134,26 @@ class AjaxController extends Controller
         }
         // Šis else blokas dažniausiai nebus pasiektas, nes forma siunčiama per AJAX POST
         return ['success' => false, 'message' => 'Neteisinga užklausa.'];
+    }
+
+    /**
+     * Veiksmas, skirtas pridėti "patinka" naujienų straipsniui.
+     * @param int $id Naujienų straipsnio ID
+     * @return array JSON atsakymas
+     */
+    public function actionLikeNews($id)
+    {
+        \Yii::$app->response->format = Response::FORMAT_JSON;
+
+        $news = News::findOne($id);
+        if ($news) {
+            // Realiame projekte, čia reikėtų patikrinti, ar vartotojas jau spaudė "patinka"
+            // ir išvengti daugkartinių paspaudimų. Tam reikėtų atskiros lentelės.
+
+            $news->updateCounters(['likes_count' => 1]); // Padidina likes_count 1 vienetu
+            return ['success' => true, 'likesCount' => $news->likes_count];
+        }
+
+        return ['success' => false, 'message' => 'Straipsnis nerastas.'];
     }
 }
