@@ -254,6 +254,33 @@ $(document).ready(function() {
         }
     });
 
+    // NAUJA: Įvykių tvarkyklė "Patinka" mygtukams
+    $('#dynamic-content-area').on('click', '.like-news-btn', function() {
+        var $button = $(this);
+        var newsId = $button.data('news-id');
+        var likeUrl = $button.data('url');
+
+        $button.prop('disabled', true); // Išjungti mygtuką, kol vyksta užklausa
+
+        $.ajax({
+            url: likeUrl,
+            type: 'POST',
+            dataType: 'json',
+            success: function(response) {
+                if (response.success) {
+                    $('#likes-count-' + newsId).text(response.likesCount); // Atnaujinti skaičių
+                } else {
+                    console.error('Klaida spaudžiant Patinka:', response.message);
+                }
+                $button.prop('disabled', false); // Įjungti mygtuką atgal
+            },
+            error: function(xhr, status, error) {
+                console.error("AJAX Like Error:", status, error, xhr.responseText);
+                $button.prop('disabled', false); // Įjungti mygtuką atgal
+            }
+        });
+    });
+
     // Įvykių tvarkyklė meniu punktams
     $('.ajax-link').on('click', function(e) {
         e.preventDefault(); // Sustabdome numatytąją nuorodos elgseną (neleidžiame puslapiui persikrauti)
