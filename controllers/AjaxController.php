@@ -5,6 +5,7 @@ namespace app\controllers;
 use yii\web\Controller;
 use app\models\News;
 use app\models\Comment; // Naujas importas
+use app\models\Notification;
 use yii\web\Response;
 use yii\filters\VerbFilter; // Reikalinga POST užklausoms
 use yii\data\Pagination; // Naujas importas
@@ -20,6 +21,7 @@ class AjaxController extends Controller
                     'create-news' => ['POST', 'GET'],
                     'create-comment' => ['POST'], // Nurodome, kad tik POST metodas leidžiamas
                     'like-news' => ['POST'], // Leisti tik POST užklausas
+                    'mark-notification-as-read' => ['POST'],
                 ],
             ],
         ];
@@ -181,7 +183,7 @@ class AjaxController extends Controller
 
         $userId = 1; // Pakeiskite į \Yii::$app->user->id realioje sistemoje
         $notifications = Notification::find()
-            ->where(['user_id' => $userId, 'is_read' => false])
+            // ->where(['user_id' => $userId, 'is_read' => false])
             ->orderBy(['created_at' => SORT_DESC])
             ->all();
 
@@ -190,7 +192,7 @@ class AjaxController extends Controller
             $notificationData[] = [
                 'id' => $notification->id,
                 'message' => $notification->message,
-                'created_at' => Yii::$app->formatter->asRelativeTime($notification->created_at), // Atvaizdavimas "prieš 5 minutes"
+                'created_at' => \Yii::$app->formatter->asRelativeTime($notification->created_at), // Atvaizdavimas "prieš 5 minutes"
                 // Galite pridėti nuorodą, susijusią su pranešimu
             ];
         }

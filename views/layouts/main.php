@@ -367,7 +367,7 @@ $(document).ready(function() {
         var notificationId = $item.data('id');
 
         $.ajax({
-            url: '<?= Url::to(['ajax/mark-notification-as-read']); ?>' + '?id=' + notificationId,
+            url: '<?= Url::to(['ajax/mark-notification-as-read']); ?>' + '&id=' + notificationId,
                type: 'POST',
                dataType: 'json',
                success: function(response) {
