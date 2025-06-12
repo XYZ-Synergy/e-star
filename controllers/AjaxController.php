@@ -209,12 +209,11 @@ class AjaxController extends Controller
     {
         \Yii::$app->response->format = Response::FORMAT_JSON;
         $notification = Notification::findOne($id);
-
         // Reikia, kad vartotojas būtų prisijungęs ir pranešimas priklausytų jam
         // if ($notification && $notification->user_id == \Yii::$app->user->id) {
 
         if ($notification) { // Pavyzdžiui be vartotojo
-            $notification->is_read = true;
+            $notification->is_read = (int) true;
             if ($notification->save()) {
                 return ['success' => true];
             }
