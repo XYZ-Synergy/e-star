@@ -7,6 +7,7 @@ use app\models\News;
 use app\models\Comment; // Naujas importas
 use yii\web\Response;
 use yii\filters\VerbFilter; // Reikalinga POST užklausoms
+use yii\data\Pagination; // Naujas importas
 
 class AjaxController extends Controller
 {
@@ -27,9 +28,10 @@ class AjaxController extends Controller
      * Veiksmas, kuris grąžins "Naujienų" turinį.
      * Naudojama AJAX užklausoms.
      *
+     * @param int $page Dabartinis puslapio numeris
      * @return string
      */
-    public function actionGetNews()
+    public function actionGetNews($page = 1)
     {
         // Išjungiame Yii layout'o naudojimą šiam veiksmui.
         // Tai svarbu, nes norime grąžinti tik turinį, be viso puslapio šablono.
@@ -37,11 +39,18 @@ class AjaxController extends Controller
 
         // Čia galėtumėte gauti naujienų duomenis iš duomenų bazės.
         // Pavyzdžiui:
-        $news = News::find()->orderBy(['created_at' => SORT_DESC])->all();
+        $query = News::find()->orderBy(['created_at' => SORT_DESC]);
+        $countQuery = clone $query;
+        $pages = new Pagination(['totalCount' => $countQuery->count(), 'pageSize' => 5]); // 5 straipsniai puslapyje
+
+        $news = $query->offset($pages->offset)
+            ->limit($pages->limit)
+            ->all();
 
         // Šiuo metu tiesiog grąžinsime paprastą HTML.
         return $this->render('news-content', [
             'news' => $news,
+            'pages' => $pages, // Perduodame Pagination objektą į vaizdą
         ]);
     }
 

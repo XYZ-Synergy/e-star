@@ -281,6 +281,20 @@ $(document).ready(function() {
         });
     });
 
+    // NAUJA: Įvykių tvarkyklė puslapiavimo nuorodoms
+    $('#dynamic-content-area').on('click', '.ajax-pagination a.page-link', function(e) {
+        e.preventDefault(); // Sustabdome numatytąjį naršymą
+
+        var url = $(this).attr('href'); // Gauname URL iš paspaustos nuorodos
+        if (url) {
+            // Atnaujiname aktyvią nuorodą meniu (Naujienos)
+            $('.ajax-link').removeClass('active');
+            $('.ajax-link[data-url="<?= Url::to(['ajax/get-news']); ?>"]').addClass('active');
+
+            loadContent(url); // Įkeliame naują puslapį per AJAX
+        }
+    });
+
     // Įvykių tvarkyklė meniu punktams
     $('.ajax-link').on('click', function(e) {
         e.preventDefault(); // Sustabdome numatytąją nuorodos elgseną (neleidžiame puslapiui persikrauti)
