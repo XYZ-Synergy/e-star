@@ -1,5 +1,6 @@
 <?php
 use yii\widgets\LinkPager; // Naujas importas
+use yii\helpers\Html;
 ?>
 <div class="ajax-content">
     <h2>Paskutinės Naujienos FOO BAR Priemiestyje!</h2>
