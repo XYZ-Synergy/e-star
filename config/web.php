@@ -22,6 +22,7 @@ $config = [
         'user' => [
             'identityClass' => 'app\models\User',
             'enableAutoLogin' => true,
+            'loginUrl' => ['site/login'], // Nukreipimo URL, jei neprisijungęs
         ],
         'errorHandler' => [
             'errorAction' => 'site/error',
@@ -42,14 +43,21 @@ $config = [
             ],
         ],
         'db' => $db,
-        /*
+
         'urlManager' => [
-            'enablePrettyUrl' => true,
+            'enablePrettyUrl' => false,
             'showScriptName' => false,
             'rules' => [
+                'login' => 'site/login', // Patogus URL prisijungimui
+                'logout' => 'site/logout',
+                'signup' => 'site/signup',
             ],
         ],
-        */
+
+        'security' => [
+            'passwordHashCost' => 13, // Kuo didesnis skaičius, tuo saugiau, bet lėčiau
+        ],
+
         'authManager' => [
             'class' => 'yii\rbac\DbManager', // Arba kitas manageris
             'defaultRoles' => ['guest'],
