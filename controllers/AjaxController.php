@@ -213,7 +213,7 @@ class AjaxController extends Controller
     {
         \Yii::$app->response->format = Response::FORMAT_JSON;
 
-        Reikia, kad vartotojas būtų prisijungęs:
+        // Reikia, kad vartotojas būtų prisijungęs:
         if (\Yii::$app->user->isGuest) {
             return ['success' => false, 'message' => 'Neprisijungęs vartotojas.'];
         }
