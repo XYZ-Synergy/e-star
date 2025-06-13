@@ -168,7 +168,7 @@ class AjaxController extends Controller
 
         $model = new Comment();
         // Jei turite vartotojų sistemą ir vartotojas yra prisijungęs:
-        // $model->user_id = \Yii::$app->user->id;
+        $model->user_id = \Yii::$app->user->id;
 
         if ($model->load(\Yii::$app->request->post())) {
             if ($model->save()) {
@@ -213,14 +213,14 @@ class AjaxController extends Controller
     {
         \Yii::$app->response->format = Response::FORMAT_JSON;
 
-        // Reikia, kad vartotojas būtų prisijungęs:
-        // if (\Yii::$app->user->isGuest) {
-        //     return ['success' => false, 'message' => 'Neprisijungęs vartotojas.'];
-        // }
+        Reikia, kad vartotojas būtų prisijungęs:
+        if (\Yii::$app->user->isGuest) {
+            return ['success' => false, 'message' => 'Neprisijungęs vartotojas.'];
+        }
 
-        $userId = 1; // Pakeiskite į \Yii::$app->user->id realioje sistemoje
+        $userId = \Yii::$app->user->id;
         $notifications = Notification::find()
-            // ->where(['user_id' => $userId, 'is_read' => false])
+            ->where(['user_id' => $userId, 'is_read' => false])
             ->orderBy(['created_at' => SORT_DESC])
             ->all();
 
@@ -247,9 +247,7 @@ class AjaxController extends Controller
         \Yii::$app->response->format = Response::FORMAT_JSON;
         $notification = Notification::findOne($id);
         // Reikia, kad vartotojas būtų prisijungęs ir pranešimas priklausytų jam
-        // if ($notification && $notification->user_id == \Yii::$app->user->id) {
-
-        if ($notification) { // Pavyzdžiui be vartotojo
+        if ($notification && $notification->user_id == \Yii::$app->user->id) {
             $notification->is_read = (int) true;
             if ($notification->save()) {
                 return ['success' => true];
