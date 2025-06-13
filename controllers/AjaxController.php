@@ -15,6 +15,41 @@ class AjaxController extends Controller
     public function behaviors()
     {
         return [
+            'access' => [
+                'class' => AccessControl::class,
+                'only' => ['create', 'update', 'delete', 'publish'], // Kuriems veiksmams taikyti kontrolę
+                'rules' => [
+                    [
+                        'actions' => ['create', 'update', 'delete'], // Veiksmai, kuriuos gali atlikti adminas ir autorius
+                        'allow' => true,
+                        'roles' => ['admin', 'author'], // Reikalingas vaidmuo
+                        // 'permissions' => ['createNews', 'updateNews', 'deleteNews'], // Arba konkrečios teisės
+                        // 'matchCallback' => function ($rule, $action) { // Galima ir sudėtingesnė logika
+                        //     // Pvz., patikrinti, ar vartotojas yra straipsnio autorius redaguojant
+                        //     if ($action->id === 'update') {
+                        //         $id = \Yii::$app->request->get('id');
+                        //         $news = News::findOne($id);
+                        //         return $news && $news->user_id === \Yii::$app->user->id;
+                        //     }
+                        //     return true;
+                        // }
+                    ],
+                    [
+                        'actions' => ['publish'], // Tik adminas gali publikuoti
+                        'allow' => true,
+                        'roles' => ['admin'],
+                    ],
+                    [
+                        'actions' => ['index', 'view', 'get-news', 'get-comments'], // Viešai prieinami veiksmai
+                        'allow' => true,
+                        'roles' => ['?', '@'], // '?' - svečias, '@' - prisijungęs vartotojas
+                    ],
+                ],
+                // 'denyCallback' => function ($rule, $action) {
+                //     // Ką daryti, jei prieiga uždrausta (pvz., nukreipti į prisijungimo puslapį arba rodyti 403 klaidą)
+                //     throw new \yii\web\ForbiddenHttpException('Jums neleidžiama atlikti šio veiksmo.');
+                // }
+            ],
             'verbs' => [
                 'class' => VerbFilter::class,
                 'actions' => [
