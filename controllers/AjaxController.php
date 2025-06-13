@@ -45,10 +45,10 @@ class AjaxController extends Controller
                         'roles' => ['?', '@'], // '?' - svečias, '@' - prisijungęs vartotojas
                     ],
                 ],
-                // 'denyCallback' => function ($rule, $action) {
-                //     // Ką daryti, jei prieiga uždrausta (pvz., nukreipti į prisijungimo puslapį arba rodyti 403 klaidą)
-                //     throw new \yii\web\ForbiddenHttpException('Jums neleidžiama atlikti šio veiksmo.');
-                // }
+                'denyCallback' => function ($rule, $action) {
+                    // Ką daryti, jei prieiga uždrausta (pvz., nukreipti į prisijungimo puslapį arba rodyti 403 klaidą)
+                    throw new \yii\web\ForbiddenHttpException('Jums neleidžiama atlikti šio veiksmo.');
+                }
             ],
             'verbs' => [
                 'class' => VerbFilter::class,
