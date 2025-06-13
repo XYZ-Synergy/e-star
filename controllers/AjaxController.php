@@ -8,7 +8,9 @@ use app\models\Comment; // Naujas importas
 use app\models\Notification;
 use yii\web\Response;
 use yii\filters\VerbFilter; // Reikalinga POST užklausoms
+use yii\filters\AccessControl; // Importuojame AccessControl
 use yii\data\Pagination; // Naujas importas
+
 
 class AjaxController extends Controller
 {
