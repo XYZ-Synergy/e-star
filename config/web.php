@@ -50,6 +50,10 @@ $config = [
             ],
         ],
         */
+        'authManager' => [
+            'class' => 'yii\rbac\DbManager', // Arba kitas manageris
+            'defaultRoles' => ['guest'],
+        ],
     ],
     'params' => $params,
 ];
