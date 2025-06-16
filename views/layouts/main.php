@@ -69,7 +69,7 @@ $(document).ready(function() {
     // Funkcija, kuri parodo įkrovimo indikatorių
     function showLoadingIndicator(targetElementId) {
         // Galite čia įdėti GIF paveikslėlį, pvz.:
-        $('#' + targetElementId).html('<img src="./images/loading.gif" alt="Kraunasi..." style="width: 50px; height: 50px;">');
+        $('#' + targetElementId).html('<img src="/images/loading.gif" alt="Kraunasi..." style="width: 50px; height: 50px;">');
         // $('#' + targetElementId).html('<p style="text-align: center; color: #666;"><i class="fas fa-spinner fa-spin"></i> Kraunasi turinys...</p>');
         // Pastaba: ikonėlei reikės Font Awesome bibliotekos įkėlimo jūsų pagrindiniame layout'e.
     }
